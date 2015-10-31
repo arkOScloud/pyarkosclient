@@ -37,7 +37,7 @@ Job objects have two properties: `id` being the Job ID, and `status` being a str
 For example, if you wanted to create a website and wait synchronously for it to finish using the Job object, you could do something like:
 
 ```
->>> job = arkos.websites.create("mysite", "wordpress", "localhost", 80)
+>>> job, data = arkos.websites.create("mysite", "wordpress", "localhost", 80)
 >>> job
 <Job 370f80f95fcf7c4e>
 >>> job.status
@@ -56,7 +56,8 @@ For example, if you wanted to create a website and wait synchronously for it to 
 ### arkos.apikeys
 
  * Get API key: `arkos.apikeys.get()`
- * Create API key: `arkos.apikeys.add("username")`
+ * Create API key: `arkos.apikeys.add("username", "app-name")`
+   * `"app-name"` should be the actual name of the app/client you are developing with pyarkOSclient.
 
 
 ### arkos.applications

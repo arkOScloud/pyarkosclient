@@ -1,6 +1,5 @@
 import aniso8601
 import base64
-import datetime
 import os
 import time
 
@@ -17,9 +16,9 @@ class APIKeys(Framework):
         data = self.conn._get("/api_keys")
         return data.get("api_keys")
 
-    def add(self, user):
-        data = self.conn._post("/api_keys", {"api_key": {"user": user}})
-        return data.get("api_keys")
+    def add(self, user, comment="pyarkOSclient"):
+        data = self.conn._post("/api_keys", {"api_key": {"user": user, "comment": comment}})
+        return data.get("api_key")
 
 
 class Applications(Framework):
@@ -51,7 +50,12 @@ class Backups(Framework):
             data = self.conn._get("/backups/{}".format(kwargs["id"]))
         else:
             data = self.conn._get("/backups")
-        return data.get("backups")
+        if data.get("backup"):
+            data["backup"]["time"] = aniso8601.parse_datetime(data["backup"]["time"])
+        elif data.get("backups"):
+            for x in data.get("backups"):
+                x["time"] = aniso8601.parse_datetime(x["time"])
+        return data.get("backup") or data.get("backups")
 
     def get_types(self):
         data = self.conn._get("/backups/types")
@@ -75,6 +79,11 @@ class Certificates(Framework):
             data = self.conn._get("/certs/{}".format(kwargs["id"]), params=kwargs)
         else:
             data = self.conn._get("/certs", params=kwargs)
+        if data.get("cert"):
+            data["cert"]["expiry"] = aniso8601.parse_datetime(data["cert"]["expiry"])
+        elif data.get("certs"):
+            for x in data.get("certs"):
+                x["expiry"] = aniso8601.parse_datetime(x["expiry"])
         return data.get("cert") or data.get("certs")
 
     def get_authorities(self, **kwargs):
@@ -248,10 +257,6 @@ class Files(Framework):
         path = path.replace("//","/")
         return base64.b64encode(path, altchars="+-").replace("=", "*")
 
-    def b64_to_path(self, b64):
-        # Convert a base64-encoded string to regular one (filesystem path).
-        return base64.b64decode(str(b64).replace("*", "="), altchars="+-")
-
     def get(self, path, **kwargs):
         data = self.conn._get("/files/"+self.path_to_b64(path), params=kwargs)
         return data.get("file") or data.get("files")
@@ -261,6 +266,12 @@ class Files(Framework):
             data = self.conn._get("/shares/{}".format(kwargs["id"]), params=kwargs)
         else:
             data = self.conn._get("/shares", params=kwargs)
+        if data.get("share") and data["share"]["expires_at"] != 0:
+            data["share"]["expires_at"] = aniso8601.parse_datetime(data["share"]["expires_at"])
+        elif data.get("shares"):
+            for x in data.get("shares"):
+                if x["expires_at"] != 0:
+                    x["expires_at"] = aniso8601.parse_datetime(x["expires_at"])
         return data.get("share") or data.get("shares")
 
     def get_share(self, **kwargs):

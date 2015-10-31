@@ -5,7 +5,7 @@ from .errors import GeneralError, NotFoundError, AuthenticationError, ServerErro
 
 
 class arkOS:
-    def __init__(self, host="http://127.0.0.1:8000", username="", password="", api_key=""):
+    def __init__(self, host="http://127.0.0.1:8765", username="", password="", api_key=""):
         self.host = host
         if username and password:
             try:
