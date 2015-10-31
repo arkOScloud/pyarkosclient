@@ -19,6 +19,6 @@ setup(
     	"License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     	"Operating System :: Unix"
     ],
-    py_modules=['pyarkosclient'],
+    packages=['pyarkosclient'],
     install_requires=requirements
 )
