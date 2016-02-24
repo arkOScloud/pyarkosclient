@@ -94,12 +94,19 @@ class arkOS:
                 r = requests.post(self.host+"/api"+endpoint, headers=headers, data=data, files=files)
             elif json:
                 r = requests.post(self.host+"/api"+endpoint, headers=headers, json=json)
+            else:
+                r = requests.post(self.host+"/api"+endpoint, headers=headers)
         except requests.exceptions.ConnectionError:
             raise GeneralError("The server could not be reached.")
         self._process_http_status(r)
         if r.status_code == 202 and r.headers.get("Location"):
-            job = Job(self.host, r.headers.get("Location").split("/")[-1], r.status_code)
-            return (job, r.json())
+            job = Job(self.host, r.headers.get("Location").split("/")[-1])
+            data = {}
+            try:
+                data = r.json()
+            except:
+                pass
+            return (job, data)
         return r.json() if not raw else r.content
 
     def _put(self, endpoint, json=None, raw=False, headers={}):
@@ -113,7 +120,7 @@ class arkOS:
             raise GeneralError("The server could not be reached.")
         self._process_http_status(r)
         if r.status_code == 202 and r.headers.get("Location"):
-            job = Job(self.host, r.headers.get("Location").split("/")[-1], r.status_code)
+            job = Job(self.host, r.headers.get("Location").split("/")[-1])
             return (job, r.json())
         return r.json() if not raw else r.content
 
@@ -128,7 +135,7 @@ class arkOS:
             raise GeneralError("The server could not be reached.")
         self._process_http_status(r)
         if r.status_code == 202 and r.headers.get("Location"):
-            job = Job(self.host, r.headers.get("Location").split("/")[-1], r.status_code)
+            job = Job(self.host, r.headers.get("Location").split("/")[-1])
             return (job, r.json())
         return r.json() if not raw else r.content
 
@@ -143,13 +150,13 @@ class arkOS:
             raise GeneralError("The server could not be reached.")
         self._process_http_status(r)
         if r.status_code == 202 and r.headers.get("Location"):
-            job = Job(self.host, r.headers.get("Location").split("/")[-1], r.status_code)
+            job = Job(self.host, r.headers.get("Location").split("/")[-1])
             return job
         return r
 
 
 class Job(object):
-    def __init__(self, host, id, status=202):
+    def __init__(self, host, id, status="running"):
         self.host = host
         self.id = id
         self.status = status

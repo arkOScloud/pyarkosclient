@@ -8,7 +8,7 @@ requirements = (
 
 setup(
     name="pyarkosclient",
-    version="0.1",
+    version="0.2",
     description="Python bindings for remote management of arkOS servers via their Kraken REST API",
     url='https://arkos.io',
     author='Jacob Cook',

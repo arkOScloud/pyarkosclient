@@ -20,6 +20,9 @@ class APIKeys(Framework):
         data = self.conn._post("/api_keys", {"api_key": {"user": user, "comment": comment}})
         return data.get("api_key")
 
+    def revoke(self, id):
+        self.conn._delete("/api_keys/{}".format(id))
+
 
 class Applications(Framework):
     def get(self, **kwargs):
@@ -91,6 +94,11 @@ class Certificates(Framework):
             data = self.conn._get("/certauths/{}".format(kwargs["id"]), params=kwargs)
         else:
             data = self.conn._get("/certauths", params=kwargs)
+        if data.get("certauth"):
+            data["certauth"]["expiry"] = aniso8601.parse_datetime(data["cert"]["expiry"])
+        elif data.get("certauths"):
+            for x in data.get("certauths"):
+                x["expiry"] = aniso8601.parse_datetime(x["expiry"])
         return data.get("certauth") or data.get("certauths")
 
     def get_authority(self, **kwargs):
@@ -319,7 +327,7 @@ class Files(Framework):
 
     def edit(self, path, data):
         data = self.conn._put("/files/"+self.path_to_b64(path),
-            {"file": {"operation": "edit", "data": data}})
+            {"file": {"operation": "edit", "path": path, "data": data}})
         return data.get("file")
 
     def extract(self, path):
