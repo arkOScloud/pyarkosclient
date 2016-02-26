@@ -160,6 +160,9 @@ class Job(object):
         self.host = host
         self.id = id
         self.status = status
+        self.message = None
+        self.message_class = None
+        self.message_headline = None
 
     def _set_status(self, status):
         if status == 200:
@@ -173,6 +176,13 @@ class Job(object):
 
     def check(self):
         r = requests.get(self.host+"/api/jobs/"+self.id)
+        try:
+            data = r.json()
+            self.message = data.get("message")
+            self.message_class = data.get("class")
+            self.message_headline = data.get("headline")
+        except:
+            pass
         self._set_status(r.status_code)
         return self.status
 
