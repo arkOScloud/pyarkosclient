@@ -274,11 +274,11 @@ class Files(Framework):
             data = self.conn._get("/shares/{}".format(kwargs["id"]), params=kwargs)
         else:
             data = self.conn._get("/shares", params=kwargs)
-        if data.get("share") and data["share"]["expires_at"] != 0:
+        if data.get("share") and data["share"]["expires_at"] and data["share"]["expires_at"] != 0:
             data["share"]["expires_at"] = aniso8601.parse_datetime(data["share"]["expires_at"])
         elif data.get("shares"):
             for x in data.get("shares"):
-                if x["expires_at"] != 0:
+                if x["expires_at"] and x["expires_at"] != 0:
                     x["expires_at"] = aniso8601.parse_datetime(x["expires_at"])
         return data.get("share") or data.get("shares")
 
@@ -358,7 +358,8 @@ class Files(Framework):
     def update_share(self, id, expires=None):
         if expires and type(expires) != int:
             expires = time.mktime(expires.timetuple()) * 1000
-        data = self.conn._put("/shares/{}".format(id), {"share": {"expires": expires or 0}})
+        data = self.conn._put("/shares/{}".format(id), {"share": {"expires": True,
+                "expires_at": expires or 0}})
         return data.get("share")
 
     def remove_share(self, id):
@@ -675,7 +676,7 @@ class Websites(Framework):
     def create(self, id, site_type, addr, port, extra_data={}):
         data = self.conn._post("/websites", {"website": {"id": id, "site_type": site_type,
             "addr": addr, "port": port, "extra_data": extra_data}})
-        return (data[0], data.get("website"))
+        return (data[0], data[1].get("website"))
 
     def edit(self, id, new_name="", addr=None, port=None):
         if not new_name and not addr and not port:
