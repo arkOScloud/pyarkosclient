@@ -2,8 +2,8 @@ from setuptools import setup
 
 
 requirements = (
-    'aniso8601==1.0.0',
-    'requests==2.6.2'
+    'aniso8601>=1.0.0',
+    'requests>=2.6.2'
 )
 
 setup(
