@@ -646,10 +646,10 @@ class System(Framework):
         self.conn._delete("/system/ssh_keys/{}".format(id))
 
     def shutdown(self):
-        self.conn._post("/config/shutdown")
+        self.conn._post("/system/shutdown")
 
     def reboot(self):
-        self.conn._post("/config/reboot")
+        self.conn._post("/system/reboot")
 
 
 class Updates(Framework):
