@@ -22,4 +22,4 @@ class ServerError(Exception):
 
 class NotFoundError(Exception):
     def __str__(self):
-        return repr("The object you requested could not be found. (HTTP 404)")
+        return repr("The item or function you requested could not be found.")

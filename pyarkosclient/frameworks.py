@@ -428,23 +428,23 @@ class Networks(Framework):
         return data.get("network")
 
     def connect(self, id):
-        data = self.conn._put("/systems/networks/{}".format(id), {"network": {"operation": "connect"}})
+        data = self.conn._put("/system/networks/{}".format(id), {"network": {"operation": "connect"}})
         return data.get("network")
 
     def disconnect(self, id):
-        data = self.conn._put("/systems/networks/{}".format(id), {"network": {"operation": "disconnect"}})
+        data = self.conn._put("/system/networks/{}".format(id), {"network": {"operation": "disconnect"}})
         return data.get("network")
 
     def enable(self, id):
-        data = self.conn._put("/systems/networks/{}".format(id), {"network": {"operation": "enable"}})
+        data = self.conn._put("/system/networks/{}".format(id), {"network": {"operation": "enable"}})
         return data.get("network")
 
     def disable(self, id):
-        data = self.conn._put("/systems/networks/{}".format(id), {"network": {"operation": "disable"}})
+        data = self.conn._put("/system/networks/{}".format(id), {"network": {"operation": "disable"}})
         return data.get("network")
 
     def delete(self, id):
-        self.conn._delete("/systems/networks/{}".format(id))
+        self.conn._delete("/system/networks/{}".format(id))
 
 
 class Packages(Framework):
@@ -456,13 +456,13 @@ class Packages(Framework):
         return data.get("package") or data.get("packages")
 
     def install(self, ids):
-        if type(ids) != list:
+        if type(ids) not in [tuple, list]:
             ids = [ids]
         data = self.conn._post("/system/packages", {"packages": [{"id": x, "operation": "install"} for x in ids]})
         return data[0]
 
     def remove(self, ids):
-        if type(ids) != list:
+        if type(ids) not in [tuple, list]:
             ids = [ids]
         data = self.conn._post("/system/packages", {"packages": [{"id": x, "operation": "remove"} for x in ids]})
         return data[0]

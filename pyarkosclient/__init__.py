@@ -17,7 +17,7 @@ class arkOS:
                 raise GeneralError("The server could not be reached.")
         elif api_key:
             try:
-                r = requests.get(host+"/api/api_keys", headers={"X-API-Key": api_key})
+                r = requests.get(host+"/api/ping", headers={"X-API-Key": api_key})
                 self._process_http_status(r)
                 self.api_key = api_key
                 self.token = None
