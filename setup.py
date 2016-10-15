@@ -1,10 +1,10 @@
 from setuptools import setup
 
 
-requirements = (
+requirements = [
     'aniso8601>=1.0.0',
     'requests>=2.6.2'
-)
+]
 
 setup(
     name="pyarkosclient",

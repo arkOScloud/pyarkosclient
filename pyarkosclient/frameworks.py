@@ -174,17 +174,17 @@ class Certificates(Framework):
         :returns: list of Certificate dicts
         """
         if kwargs.get("id"):
-            data = self.conn._get("/certs/{0}".format(kwargs["id"]),
+            data = self.conn._get("/certificates/{0}".format(kwargs["id"]),
                                   params=kwargs)
         else:
-            data = self.conn._get("/certs", params=kwargs)
-        if data.get("cert"):
-            ex = data["cert"]["expiry"]
-            data["cert"]["expiry"] = aniso8601.parse_datetime(ex)
-        elif data.get("certs"):
-            for x in data.get("certs"):
+            data = self.conn._get("/certificates", params=kwargs)
+        if data.get("certificate"):
+            ex = data["certificate"]["expiry"]
+            data["certificate"]["expiry"] = aniso8601.parse_datetime(ex)
+        elif data.get("certificates"):
+            for x in data.get("certificates"):
                 x["expiry"] = aniso8601.parse_datetime(x["expiry"])
-        return data.get("cert") or data.get("certs")
+        return data.get("certificate") or data.get("certificates")
 
     def get_authorities(self, **kwargs):
         """
@@ -194,17 +194,17 @@ class Certificates(Framework):
         :returns: list of CertificateAuthority dicts
         """
         if kwargs.get("id"):
-            data = self.conn._get("/certauths/{0}".format(kwargs["id"]),
+            data = self.conn._get("/authorities/{0}".format(kwargs["id"]),
                                   params=kwargs)
         else:
-            data = self.conn._get("/certauths", params=kwargs)
-        if data.get("certauth"):
-            ex = data["cert"]["expiry"]
-            data["certauth"]["expiry"] = aniso8601.parse_datetime(ex)
-        elif data.get("certauths"):
-            for x in data.get("certauths"):
+            data = self.conn._get("/authorities", params=kwargs)
+        if data.get("authority"):
+            ex = data["authority"]["expiry"]
+            data["authority"]["expiry"] = aniso8601.parse_datetime(ex)
+        elif data.get("authorities"):
+            for x in data.get("authorities"):
                 x["expiry"] = aniso8601.parse_datetime(x["expiry"])
-        return data.get("certauth") or data.get("certauths")
+        return data.get("authority") or data.get("authorities")
 
     def get_authority(self, **kwargs):
         """
@@ -221,8 +221,8 @@ class Certificates(Framework):
 
         :returns: list of Assign dicts
         """
-        data = self.conn._get("/certassigns")
-        return data.get("certassigns")
+        data = self.conn._get("/assignments")
+        return data.get("assignments")
 
     def download_authority(self, id):
         """
@@ -231,7 +231,7 @@ class Certificates(Framework):
         :param str id: certificate authority ID
         :returns: CertificateAuthority as str
         """
-        return self.conn._get("/certauths/{0}".format(id),
+        return self.conn._get("/authorities/{0}".format(id),
                               params={"download": True}, raw=True)
 
     def generate(
@@ -253,7 +253,7 @@ class Certificates(Framework):
         cert = {"id": name, "domain": domain, "country": country,
                 "state": state, "locale": locale, "email": email,
                 "keytype": keytype, "keylength": keylength}
-        data = self.conn._post("/certs", {"cert": cert})
+        data = self.conn._post("/certificates", {"cert": cert})
         return (data[0], data[1].get("cert"))
 
     def upload(self, name, cert, key, chain=None):
@@ -273,7 +273,7 @@ class Certificates(Framework):
         if type(chain) == str:
             cert = open(chain, "r")
         files = {"file[0]": cert, "file[1]": key, "file[2]": chain}
-        data = self.conn._post("/certs", data={"id": name}, files=files)
+        data = self.conn._post("/certificates", data={"id": name}, files=files)
         return (data[0], data[1].get("cert"))
 
     def assign(self, id, atype=None, app_id=None, special_id=None,
@@ -304,7 +304,7 @@ class Certificates(Framework):
             assigns.append({"type": "website", "id": app_id})
         else:
             assigns.append({"type": "app", "aid": app_id, "sid": special_id})
-        data = self.conn._put("/certs/{0}".format(id),
+        data = self.conn._put("/certificates/{0}".format(id),
                               {"cert": {"assigns": assigns}})
         return data.get("cert")
 
@@ -336,7 +336,7 @@ class Certificates(Framework):
             assigns.remove({"type": "website", "id": app_id})
         else:
             assigns.remove({"type": "app", "aid": app_id, "sid": special_id})
-        data = self.conn._put("/certs/{0}".format(id),
+        data = self.conn._put("/certificates/{0}".format(id),
                               {"cert": {"assigns": assigns}})
         return data.get("cert")
 
@@ -346,7 +346,7 @@ class Certificates(Framework):
 
         :param str id: Certificate name
         """
-        self.conn._delete("/certs/{0}".format(id))
+        self.conn._delete("/certificates/{0}".format(id))
 
     def delete_authority(self, id):
         """
@@ -354,7 +354,7 @@ class Certificates(Framework):
 
         :param str id: Certificate authority name
         """
-        self.conn._delete("/certauths/{0}".format(id))
+        self.conn._delete("/authorities/{0}".format(id))
 
 
 class Config(Framework):
@@ -391,7 +391,7 @@ class Config(Framework):
         self.load()
 
     def save(self):
-        data = self.conn._put("/config", {"config": self._config})
+        self.conn._put("/config", {"config": self._config})
 
     def load(self):
         data = self.conn._get("/config")
@@ -450,8 +450,12 @@ class Databases(Framework):
         self.conn._delete("/database_users/{0}".format(id))
 
     def get_types(self, **kwargs):
-        data = self.conn._get("/database_types", params=kwargs)
-        return data.get("database_types")
+        if kwargs.get("id"):
+            data = self.conn._get("/database_types/{0}".format(kwargs["id"]),
+                                  params=kwargs)
+        else:
+            data = self.conn._get("/database_types", params=kwargs)
+        return data.get("database_types") or data.get("database_type")
 
 
 class Files(Framework):
@@ -466,19 +470,19 @@ class Files(Framework):
 
     def get_shares(self, **kwargs):
         if kwargs.get("id"):
-            data = self.conn._get("/shares/{0}".format(kwargs["id"]),
+            data = self.conn._get("/shared_files/{0}".format(kwargs["id"]),
                                   params=kwargs)
         else:
-            data = self.conn._get("/shares", params=kwargs)
-        if data.get("share") and data["share"]["expires_at"] \
-           and data["share"]["expires_at"] != 0:
-            ex = data["share"]["expires_at"]
-            data["share"]["expires_at"] = aniso8601.parse_datetime(ex)
-        elif data.get("shares"):
-            for x in data.get("shares"):
+            data = self.conn._get("/shared_files", params=kwargs)
+        if data.get("shared_file") and data["shared_file"]["expires_at"] \
+           and data["shared_file"]["expires_at"] != 0:
+            ex = data["shared_file"]["expires_at"]
+            data["shared_file"]["expires_at"] = aniso8601.parse_datetime(ex)
+        elif data.get("shared_files"):
+            for x in data.get("shared_files"):
                 if x["expires_at"] and x["expires_at"] != 0:
                     x["expires_at"] = aniso8601.parse_datetime(x["expires_at"])
-        return data.get("share") or data.get("shares")
+        return data.get("shared_file") or data.get("shared_files")
 
     def get_share(self, **kwargs):
         return self.get_shares(**kwargs)
@@ -925,8 +929,8 @@ class Websites(Framework):
         return data.get("website") or data.get("websites")
 
     def create(self, id, site_type, addr, port, extra_data={}):
-        webobj = {"id": id, "site_type": site_type, "addr": addr, "port": port,
-                  "extra_data": extra_data}
+        webobj = {"id": id, "site_type": site_type, "domain": addr,
+                  "port": port, "extra_data": extra_data}
         data = self.conn._post("/websites", {"website": webobj})
         return (data[0], data[1].get("website"))
 
@@ -935,9 +939,9 @@ class Websites(Framework):
             raise GeneralError("Must supply items to edit")
         data = self.conn._get("/websites/{0}".format(id))
         data = data.get("website")
-        addr = addr or data["addr"]
+        addr = addr or data["domain"]
         port = port or data["port"]
-        webobj = {"addr": addr, "port": port, "new_name": new_name}
+        webobj = {"domain": addr, "port": port, "new_name": new_name}
         data = self.conn._put("/websites/{0}".format(id), {"website": webobj})
         return data.get("website")
 
